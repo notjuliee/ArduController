@@ -5,7 +5,6 @@ from sys import argv
 
 boi = serial.Serial(argv[1]);
 
-
 while True:
     mem = psutil.virtual_memory();
     mem = round((100/(mem.total/mem.used))*10)/10;
