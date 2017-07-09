@@ -15,6 +15,16 @@ char* pnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
 
 Arduboy2 arduboy;
 
+void customBegin() {
+  arduboy.boot();
+  arduboy.blank();
+  arduboy.flashlight();
+  arduboy.systemButtons();
+  do {
+    delay(50);
+  } while (arduboy.buttonsState());
+}
+
 void initEEPRom() {
   for (int i = 0; i < EEPROM.length(); i++) {
     EEPROM.write(i, 0);
@@ -112,7 +122,7 @@ void drawInput() {
 
 void setup() {
   Serial.begin(9600);
-  arduboy.begin();
+  customBegin();
   Keyboard.begin();
   arduboy.clear();
   drawProfile(pnames[0]);
