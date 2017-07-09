@@ -1,0 +1,5 @@
+{
+	"name": "Default",
+	"defaultSlot": 1,
+	"profile": "LEFT,RIGHT,UP,DOWN,a,b"
+}

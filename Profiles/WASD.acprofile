@@ -1,0 +1,5 @@
+{
+	"name": "WASD",
+	"defaultSlot": 2,
+	"profile": "a,d,w,s, ,RETURN"
+}

@@ -1,0 +1,5 @@
+{
+	"name": "Platformer",
+	"defaultSlot": 3,
+	"profile": "LEFT,RIGHT,UP,DOWN, ,RETURN"
+}
