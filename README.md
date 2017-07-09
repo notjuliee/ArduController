@@ -14,6 +14,8 @@ python3 ApplyProfile.py /dev/ttyACM1 Profiles/Sterdeen.acprofile
 
 replacing `/dev/ttyACM1` with your ArduBoy's serial port and `Profiles/Sterdeen.acprofile` wiht the path to the `.acprofile` you wish to use.
 
+Switching profiles: Press `A+B` on the ArduBoy to open the profile menu. To navigate the menu, use the `UP` and `DOWN` keys, and select a profile with `A`
+
 # Writing profiles
 
 The format for a `.acprofile` is:
