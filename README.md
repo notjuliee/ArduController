@@ -4,7 +4,7 @@ Use an [ArduBoy](https://arduboy.com/) as a keypad.
 
 # Usage
 
-Flash `ArduController.ini` to an ArduBoy. This was tested on the Kickstarted Edition, but it should work on all of them.
+Flash `ArduController.ini` to an ArduBoy. This was tested on the Kickstarter Edition, but it should work on all of them.
 
 To flash a custom profile, use
 
