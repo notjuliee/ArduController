@@ -18,7 +18,6 @@ void drawProfile(char* pname) {
   arduboy.print(F("Profile: "));
   arduboy.setCursor(6*9,0);
   arduboy.print(pname);
-  arduboy.display();
 }
 
 void doKeys() {
@@ -45,8 +44,6 @@ void drawMenu() {
 
 void drawInput() {
   if (!inMenu) {
-    arduboy.clear();
-    arduboy.setCursor(0, 0);
     drawProfile(pnames[currentProfile]);
     arduboy.setCursor(0, 10);
     arduboy.print(Serial.readStringUntil(','));
@@ -114,6 +111,7 @@ void loop() {
     if (arduboy.pressed(A_BUTTON)) {
       if (!keyPressed[2]) {
         drawProfile(pnames[currentProfile]);
+        arduboy.display();
         inMenu = false;
       }
     } else {
