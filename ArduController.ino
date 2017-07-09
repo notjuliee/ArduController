@@ -1,22 +1,73 @@
 #include <Keyboard.h>
 #include <Arduboy2.h>
+#include <EEPROM.h>
 
 int currentProfile = 0;
-int profiles [3][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { ' ', ' ', ' ', ' ', ' ', ' ' }, { ' ', ' ', ' ', ' ', ' ', ' ' } };
+int defaultProfiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN }, { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN }, { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
+int profiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN }, { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_UP_ARROW, KEY_RETURN }, { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
 int keys [6] = { LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, A_BUTTON, B_BUTTON };
 
 bool inMenu = false;
 bool keyPressed [3] = { false, false, false };
 
-char* pnames [3] = { "Default", "Custom1", "Custom2" };
+char* defaultPnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
+char* pnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
 
 Arduboy2 arduboy;
 
+void initEEPRom() {
+  for (int i = 0; i < EEPROM.length(); i++) {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.write(0, 'f');
+  for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      EEPROM.write(x*6+y+1, defaultProfiles[x][y]);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 32; y++) {
+      EEPROM.write(32*x+y+48, defaultPnames[x][y]);
+    }
+  }
+}
+
+void loadFromEEPRom() {
+  for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      profiles[x][y] = EEPROM.read(x*6+y+1);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
+    pnames[x] = new char[32];
+    for (int y = 0; y < 32; y++) {
+      pnames[x][y] = EEPROM.read(32*x+y+48);
+    }
+  }
+}
+
+void writeToEEPRom() {
+  for (int i = 0; i < EEPROM.length(); i++) {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.write(0, 'f');
+  for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      EEPROM.write(x*6+y+1, profiles[x][y]);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 32; y++) {
+      EEPROM.write(32*x+y+48, pnames[x][y]);
+    }
+  }
+}
+
 void drawProfile(char* pname) {
   arduboy.clear();
-  arduboy.setCursor(0,0);
+  arduboy.setCursor(0, 0);
   arduboy.print(F("Profile: "));
-  arduboy.setCursor(6*9,0);
+  arduboy.setCursor(6 * 9, 0);
   arduboy.print(pname);
 }
 
@@ -33,10 +84,10 @@ void doKeys() {
 void drawMenu() {
   Keyboard.releaseAll();
   arduboy.clear();
-  for (int i = 0; i < 3; i++) {
-    arduboy.setCursor(0, i*10);
+  for (int i = 0; i < 5; i++) {
+    arduboy.setCursor(0, i * 10);
     if (currentProfile == i) arduboy.print(F("> "));
-    arduboy.setCursor(12, i*10);
+    arduboy.setCursor(12, i * 10);
     arduboy.print(pnames[i]);
   }
   arduboy.display();
@@ -66,6 +117,10 @@ void setup() {
   arduboy.clear();
   drawProfile(pnames[0]);
   arduboy.display();
+  if (EEPROM.read(0) != 'f') {
+    initEEPRom();
+  }
+  loadFromEEPRom();
 }
 
 void loop() {
@@ -79,7 +134,16 @@ void loop() {
       for (int i = 0; i < 6; i++) {
         profiles[slot][i] = Serial.parseInt();
       }
+      int nameLen = Serial.parseInt();
+      char* newNameChar = new char;
+      Serial.readBytesUntil('\r', newNameChar, 32);
+      newNameChar[nameLen+1] = 0;
+      pnames[slot] = newNameChar+1;
       Keyboard.releaseAll();
+      writeToEEPRom();
+    }
+    if (instr == 2) {
+      EEPROM.write(0,0);
     }
   }
   if (arduboy.pressed(B_BUTTON + A_BUTTON) && !inMenu) {
@@ -90,7 +154,7 @@ void loop() {
   if (!inMenu) {
     doKeys();
   } else {
-    if (arduboy.pressed(DOWN_BUTTON) && currentProfile < 2) {
+    if (arduboy.pressed(DOWN_BUTTON) && currentProfile < 4) {
       if (!keyPressed[0]) {
         currentProfile++;
         drawMenu();

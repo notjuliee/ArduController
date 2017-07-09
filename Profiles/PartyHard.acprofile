@@ -1,1 +1,5 @@
-LEFT,RIGHT,UP,DOWN,j,l
+{
+	"name": "Party Hard",
+	"defaultSlot": 2,
+	"profile": "LEFT,RIGHT,UP,DOWN,j,l"
+}

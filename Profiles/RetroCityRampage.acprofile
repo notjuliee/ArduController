@@ -1,1 +1,5 @@
-LEFT,RIGHT,UP,DOWN,LSHIFT,RETURN
+{
+	"name": "RetroCR",
+	"defaultSlot": 3,
+	"profile": "LEFT,RIGHT,UP,DOWN,LSHIFT,RETURN"
+}

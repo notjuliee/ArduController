@@ -2,6 +2,7 @@
 
 import serial
 from sys import argv, exit
+from json import loads
 
 # Note. If the key you need isn't here, you can get the code from https://www.arduino.cc/en/Reference/KeyboardModifiers and use that instead.
 
@@ -17,7 +18,7 @@ keyCodes = {
 }
 
 if len(argv) < 3:
-    print("Usage: %s </path/to/serialPort> </path/to/.acprofile> [slot number (1-2)]" % argv[0]);
+    print("Usage: %s </path/to/serialPort> </path/to/.acprofile> [slot number (1-5)]" % argv[0]);
     exit(1);
 
 print("Opening serial port %s" % argv[1]);
@@ -29,17 +30,21 @@ except:
 
 print("Trying to read profile %s" % argv[2]);
 try:
-    fc = open(argv[2], 'r').read().replace("\n","");
+    profile = loads(open(argv[2], 'r').read());
+    fc = profile["profile"];
 except:
     print("Failed to read profile!");
     exit(1);
 
-try:
-    slot = int(argv[3]);
-except:
-    slot = 1;
+if len(profile["name"]) > 12:
+    profile["name"] = profile["name"][:11];
 
-if slot < 1 or slot > 2:
+try:
+    slot = int(argv[3])-1;
+except:
+    slot = profile["defaultSlot"]-1;
+
+if slot < 0 or slot > 4:
     print("Invalid slot number!");
     exit(1);
 
@@ -54,4 +59,4 @@ fc = " ".join(fc);
 for i in keyCodes:
     fc = fc.replace(i, keyCodes[i]);
 
-boi.write(b"1 %d %s\r" % (slot, bytearray(fc, "UTF-8")));
+boi.write(b"1 %d %s %d %s\r" % (slot, bytearray(fc, "UTF-8"), len(profile["name"]), bytearray(profile["name"], "UTF-8")));

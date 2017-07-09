@@ -1,1 +1,5 @@
-LEFT,RIGHT,UP,DOWN,x,c
+{
+	"name": "Sterdeen",
+	"defaultSlot": 4,
+	"profile": "LEFT,RIGHT,UP,DOWN,x,c"
+}

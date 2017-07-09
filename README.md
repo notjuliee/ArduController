@@ -9,19 +9,33 @@ Flash `ArduController.ini` to an ArduBoy. This was tested on the Kickstarted Edi
 To flash a custom profile, use
 
 ```
-python3 ApplyProfile.py /dev/ttyACM1 Profiles/Sterdeen.acprofile
+python3 ApplyProfile.py /dev/ttyACM1 Profiles/Sterdeen.acprofile 1
 ```
 
-replacing `/dev/ttyACM1` with your ArduBoy's serial port and `Profiles/Sterdeen.acprofile` wiht the path to the `.acprofile` you wish to use.
+replacing `/dev/ttyACM1` with your ArduBoy's serial port and `Profiles/Sterdeen.acprofile` with the path to the `.acprofile` you wish to use.
+
+The last argument is optional and specifies which slot you want the profile to be saved on. (Can be 1-5)
 
 Switching profiles: Press `A+B` on the ArduBoy to open the profile menu. To navigate the menu, use the `UP` and `DOWN` keys, and select a profile with `A`
+
+To reset all profiles, use
+
+```
+python3 ResetProfiles.py /dev/ttyACM1
+```
+
+replacing `/dev/ttyACM1` with your ArduBoy's serial port, then reboot the ArduBoy.
 
 # Writing profiles
 
 The format for a `.acprofile` is:
 
 ```
-LeftAction,RightAction,UpAction,DownAction,AAction,BAction
+{
+	"name": "Profile Name", // Up to 12 letters
+	"defaultSlot": 1, // The slot this profile will save to if one isn's explicitly specified. (1-5)
+	"profile": "LeftAction,RightAction,UpAction,DownAction,AAction,BAction" // A profile string
+}
 ```
 
 `Action` can be either:
