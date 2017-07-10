@@ -14,7 +14,10 @@ keyCodes = {
         "RIGHT": "215",
         "LEFT": "216",
         "DOWN": "217",
-        "UP": "218"
+        "UP": "218",
+        "BACKSPACE": "219",
+        "TAB": "179",
+        "ESC": "177"
 }
 
 if len(argv) < 3:

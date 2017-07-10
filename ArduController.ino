@@ -3,8 +3,12 @@
 #include <EEPROM.h>
 
 int currentProfile = 0;
-int defaultProfiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN }, { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN }, { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
-int profiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN }, { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_UP_ARROW, KEY_RETURN }, { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
+int defaultProfiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
+                               { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
+                               { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
+int profiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
+                               { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
+                               { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
 int keys [6] = { LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, A_BUTTON, B_BUTTON };
 
 bool inMenu = false;
