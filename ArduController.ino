@@ -4,12 +4,15 @@
 
 int currentProfile = 0;
 int defaultProfiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
-                               { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
-                               { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
+  { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
+  { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' }
+};
 int profiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
-                               { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
-                               { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' } };
+  { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
+  { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' }
+};
 int keys [6] = { LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, A_BUTTON, B_BUTTON };
+bool pressedKeys [6] = { false, false, false, false, false, false };
 
 bool inMenu = false;
 bool keyPressed [3] = { false, false, false };
@@ -18,6 +21,13 @@ char* defaultPnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters
 char* pnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
 
 Arduboy2 arduboy;
+
+void releaseAll() {
+  Keyboard.releaseAll();
+  for (int i = 0; i < 6; i++) {
+    pressedKeys [i] = false;
+  }
+}
 
 void customBegin() {
   arduboy.boot();
@@ -36,12 +46,12 @@ void initEEPRom() {
   EEPROM.write(0, 'f');
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 6; y++) {
-      EEPROM.write(x*6+y+1, defaultProfiles[x][y]);
+      EEPROM.write(x * 6 + y + 1, defaultProfiles[x][y]);
     }
   }
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 32; y++) {
-      EEPROM.write(32*x+y+48, defaultPnames[x][y]);
+      EEPROM.write(32 * x + y + 48, defaultPnames[x][y]);
     }
   }
 }
@@ -49,13 +59,13 @@ void initEEPRom() {
 void loadFromEEPRom() {
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 6; y++) {
-      profiles[x][y] = EEPROM.read(x*6+y+1);
+      profiles[x][y] = EEPROM.read(x * 6 + y + 1);
     }
   }
   for (int x = 0; x < 5; x++) {
     pnames[x] = new char[32];
     for (int y = 0; y < 32; y++) {
-      pnames[x][y] = EEPROM.read(32*x+y+48);
+      pnames[x][y] = EEPROM.read(32 * x + y + 48);
     }
   }
 }
@@ -67,12 +77,12 @@ void writeToEEPRom() {
   EEPROM.write(0, 'f');
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 6; y++) {
-      EEPROM.write(x*6+y+1, profiles[x][y]);
+      EEPROM.write(x * 6 + y + 1, profiles[x][y]);
     }
   }
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 32; y++) {
-      EEPROM.write(32*x+y+48, pnames[x][y]);
+      EEPROM.write(32 * x + y + 48, pnames[x][y]);
     }
   }
 }
@@ -88,15 +98,18 @@ void drawProfile(char* pname) {
 void doKeys() {
   for (int i = 0; i < 6; i++) {
     if (arduboy.pressed(keys[i])) {
-      Keyboard.press(profiles[currentProfile][i]);
-    } else {
+      if (!pressedKeys[i]) {
+        Keyboard.press(profiles[currentProfile][i]);
+        pressedKeys[i] = true;
+      }
+    } else if (pressedKeys[i]) {
       Keyboard.release(profiles[currentProfile][i]);
+      pressedKeys[i] = false;
     }
   }
 }
 
 void drawMenu() {
-  Keyboard.releaseAll();
   arduboy.clear();
   for (int i = 0; i < 5; i++) {
     arduboy.setCursor(0, i * 10);
@@ -151,19 +164,20 @@ void loop() {
       int nameLen = Serial.parseInt();
       char* newNameChar = new char;
       Serial.readBytesUntil('\r', newNameChar, 32);
-      newNameChar[nameLen+1] = 0;
-      pnames[slot] = newNameChar+1;
-      Keyboard.releaseAll();
+      newNameChar[nameLen + 1] = 0;
+      pnames[slot] = newNameChar + 1;
+      releaseAll();
       writeToEEPRom();
     }
     if (instr == 2) {
-      EEPROM.write(0,0);
+      EEPROM.write(0, 0);
     }
   }
   if (arduboy.pressed(B_BUTTON + A_BUTTON) && !inMenu) {
     inMenu = true;
     keyPressed[2] = true;
     drawMenu();
+    releaseAll();
   }
   if (!inMenu) {
     doKeys();
