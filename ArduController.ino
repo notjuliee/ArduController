@@ -24,6 +24,7 @@ Arduboy2 arduboy;
 
 void releaseAll() {
   Keyboard.releaseAll();
+  digitalWrite(LED_BUILTIN_TX, HIGH);
   for (int i = 0; i < 6; i++) {
     pressedKeys [i] = false;
   }
@@ -100,10 +101,12 @@ void doKeys() {
     if (arduboy.pressed(keys[i])) {
       if (!pressedKeys[i]) {
         Keyboard.press(profiles[currentProfile][i]);
+        digitalWrite(LED_BUILTIN_TX, HIGH);
         pressedKeys[i] = true;
       }
     } else if (pressedKeys[i]) {
       Keyboard.release(profiles[currentProfile][i]);
+      digitalWrite(LED_BUILTIN_TX, HIGH);
       pressedKeys[i] = false;
     }
   }
