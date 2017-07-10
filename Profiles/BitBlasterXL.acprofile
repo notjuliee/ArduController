@@ -1,0 +1,5 @@
+{
+	"name": "Bit Blaster",
+	"defaultSlot": 5,
+	"profile": "LEFT,RIGHT,UP,DOWN,LCTRL,LALT"
+}
