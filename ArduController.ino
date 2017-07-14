@@ -1,16 +1,18 @@
 #include <Keyboard.h>
 #include <Arduboy2.h>
 #include <EEPROM.h>
+#include <Joystick.h>
 
 int currentProfile = 0;
-int defaultProfiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
+
+int defaultProfileTypes [5][6] = { { 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+int profileTypes [5][6];
+  
+int defaultProfiles [5][6] = { { 2, 3, 4, 5, 0, 1 }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
   { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
-  { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' }
-};
-int profiles [5][6] = { { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, 'a', 'b' }, { 'a', 'd', 'w', 's', ' ', KEY_RETURN },
-  { KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_UP_ARROW, KEY_DOWN_ARROW, ' ', KEY_RETURN },
-  { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' }
-};
+  { '1', '2', '3', '4', '5', '6' }, { 'l', 'r', 'u', 'd', 'a', 'b' }};  
+int profiles [5][6];
+
 int keys [6] = { LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, A_BUTTON, B_BUTTON };
 bool pressedKeys [6] = { false, false, false, false, false, false };
 
@@ -18,9 +20,10 @@ bool inMenu = false;
 bool keyPressed [3] = { false, false, false };
 
 char* defaultPnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
-char* pnames [5] = { "Default", "WASD", "Platformer", "Numbers", "Letters" };
+char* pnames [5];
 
 Arduboy2 arduboy;
+Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 4, 0, true, true, false, false, false, false, false, false, false, false, false);
 
 void releaseAll() {
   Keyboard.releaseAll();
@@ -44,15 +47,20 @@ void initEEPRom() {
   for (int i = 0; i < EEPROM.length(); i++) {
     EEPROM.write(i, 0);
   }
-  EEPROM.write(0, 'f');
+  EEPROM.write(0, 'h');
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 6; y++) {
       EEPROM.write(x * 6 + y + 1, defaultProfiles[x][y]);
     }
   }
   for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      EEPROM.write(x * 6 + y + 48, defaultProfileTypes[x][y]);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 32; y++) {
-      EEPROM.write(32 * x + y + 48, defaultPnames[x][y]);
+      EEPROM.write(32 * x + y + 128, defaultPnames[x][y]);
     }
   }
 }
@@ -64,9 +72,14 @@ void loadFromEEPRom() {
     }
   }
   for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      profileTypes[x][y] = EEPROM.read(x * 6 + y + 48);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
     pnames[x] = new char[32];
     for (int y = 0; y < 32; y++) {
-      pnames[x][y] = EEPROM.read(32 * x + y + 48);
+      pnames[x][y] = EEPROM.read(32 * x + y + 128);
     }
   }
 }
@@ -75,15 +88,20 @@ void writeToEEPRom() {
   for (int i = 0; i < EEPROM.length(); i++) {
     EEPROM.write(i, 0);
   }
-  EEPROM.write(0, 'f');
+  EEPROM.write(0, 'h');
   for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 6; y++) {
       EEPROM.write(x * 6 + y + 1, profiles[x][y]);
     }
   }
   for (int x = 0; x < 5; x++) {
+    for (int y = 0; y < 6; y++) {
+      EEPROM.write(x * 6 + y + 48, profileTypes[x][y]);
+    }
+  }
+  for (int x = 0; x < 5; x++) {
     for (int y = 0; y < 32; y++) {
-      EEPROM.write(32 * x + y + 48, pnames[x][y]);
+      EEPROM.write(32 * x + y + 128, pnames[x][y]);
     }
   }
 }
@@ -99,6 +117,7 @@ void drawProfile(char* pname) {
 void doKeys() {
   for (int i = 0; i < 6; i++) {
     if (arduboy.pressed(keys[i])) {
+      
       if (!pressedKeys[i]) {
         Keyboard.press(profiles[currentProfile][i]);
         digitalWrite(LED_BUILTIN_TX, HIGH);
@@ -147,7 +166,7 @@ void setup() {
   arduboy.clear();
   drawProfile(pnames[0]);
   arduboy.display();
-  if (EEPROM.read(0) != 'f') {
+  if (EEPROM.read(0) != 'h') {
     initEEPRom();
   }
   loadFromEEPRom();
